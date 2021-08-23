@@ -5,12 +5,14 @@ import com.guilherme.pokedexjusta.model.Usuario;
 import com.guilherme.pokedexjusta.repository.RepositorioUsuario;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UsuarioServiceimpl implements UsuarioService{
+@Service
+public class UsuarioServiceimpl implements UsuarioService {
 
     @Autowired
     RepositorioUsuario repositorioUsuario;
@@ -25,7 +27,7 @@ public class UsuarioServiceimpl implements UsuarioService{
     }
 
     private void validaSenha(UsuarioDTO usuarioDTO) {
-        if (usuarioDTO.getSenha() == null){
+        if (usuarioDTO.getSenha() == null) {
             throw new RuntimeException("Senha é requerida.");
         }
     }
@@ -46,18 +48,28 @@ public class UsuarioServiceimpl implements UsuarioService{
     public UsuarioDTO editarUsuario(UsuarioDTO usuarioDTO) {
         validaInformacoesBasicas(usuarioDTO);
 
-        this.repositorioUsuario.save(Usuario.toEntidade(usuarioDTO));
+        this.repositorioUsuario.findById(usuarioDTO.getId())
+                .map(usu -> {
+                    usu.setNomeUsuario(usuarioDTO.getNomeUsuario());
+                    usu.setEmail(usuarioDTO.getEmail());
+                    this.repositorioUsuario.save(usu);
+                    return usu;
+                });
         return usuarioDTO;
     }
 
     @Override
-    public void deletarUsuarioPorId(int id) throws NotFoundException {
+    public void deletarUsuarioPorId(int id) {
 
-        Optional.ofNullable(this.repositorioUsuario.getById(id))
-                .map(usuario -> {
-                    repositorioUsuario.delete(usuario);
-                    return usuario;
-                }).orElseThrow(() -> new NotFoundException("Usuario não encontrado."));
+        try {
+            Optional.ofNullable(this.repositorioUsuario.getById(id))
+                    .map(usuario -> {
+                        repositorioUsuario.delete(usuario);
+                        return usuario;
+                    }).orElseThrow(() -> new NotFoundException("Usuario não encontrado."));
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -67,10 +79,15 @@ public class UsuarioServiceimpl implements UsuarioService{
         return list;
     }
 
-    public UsuarioDTO obterUsuarioPorId(int id) throws NotFoundException {
-        return Optional
-                .ofNullable(this.repositorioUsuario.getById(id))
-                .map(Usuario::toDTO)
-                .orElseThrow(() -> new NotFoundException("Usuario não encontrado."));
+    public UsuarioDTO obterUsuarioPorId(int id) {
+        try {
+            return Optional
+                    .ofNullable(this.repositorioUsuario.getById(id))
+                    .map(Usuario::toDTO)
+                    .orElseThrow(() -> new NotFoundException("Usuario não encontrado."));
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

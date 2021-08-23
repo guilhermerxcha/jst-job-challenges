@@ -3,12 +3,8 @@ package com.guilherme.pokedexjusta.controller;
 import com.guilherme.pokedexjusta.dto.UsuarioDTO;
 import com.guilherme.pokedexjusta.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 public class UsuarioController {
@@ -16,8 +12,28 @@ public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
 
-    @RequestMapping(value = "/novo", method =  RequestMethod.POST)
-    public UsuarioDTO criarNovoUsuario(@Valid @RequestBody UsuarioDTO usuarioDTO) {
-        return usuarioService.criarNovoUsuario(usuarioDTO);
+    @PostMapping(value = "/novousuario")
+    public UsuarioDTO criarNovoUsuario(@RequestBody UsuarioDTO usuarioDTO) {
+        return this.usuarioService.criarNovoUsuario(usuarioDTO);
+    }
+
+    @PutMapping(value = "/editarusuario")
+    public UsuarioDTO editarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
+        return this.usuarioService.editarUsuario(usuarioDTO);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public void deletarUsuario( @PathVariable int id) {
+        this.usuarioService.deletarUsuarioPorId(id);
+    }
+
+    @GetMapping(value = "/obtertodosusuarios")
+    public List<UsuarioDTO> buscarTodos() {
+        return this.usuarioService.obterTodosUsuarios();
+    }
+
+    @GetMapping(value = "/{id}")
+    public UsuarioDTO obterUsuarioPorId(@PathVariable int id) {
+        return this.usuarioService.obterUsuarioPorId(id);
     }
 }
