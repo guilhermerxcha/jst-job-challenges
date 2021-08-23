@@ -13,4 +13,8 @@ public interface UsuarioService {
     List<UsuarioDTO> obterTodosUsuarios();
 
     UsuarioDTO obterUsuarioPorId(int id);
+
+    UsuarioDTO obterUsuarioPorEmail(String email);
+
+    void deletarTodosUsuarios();
 }

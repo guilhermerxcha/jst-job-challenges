@@ -90,4 +90,14 @@ public class UsuarioServiceimpl implements UsuarioService {
         }
         return null;
     }
+
+    @Override
+    public UsuarioDTO obterUsuarioPorEmail(String email) {
+        return Optional.ofNullable(this.repositorioUsuario.obtemPorEmail(email)).map(Usuario::toDTO).orElse(null);
+    }
+
+    @Override
+    public void deletarTodosUsuarios() {
+        this.repositorioUsuario.deleteAll();
+    }
 }
